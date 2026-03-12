@@ -1,0 +1,65 @@
+"""
+Сводная схема публичного GraphQL API модуля НВ.
+Файл подготовлен для лабораторной работы №4 как краткая выжимка
+из schema.graphql сервисов чтения и команд.
+"""
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+  cumlistCumLists(
+    skip: Int
+    take: Int
+    where: CumlistCumListFilterInput
+    order: [CumlistCumListSortInput!]
+  ): CumlistCumListsCollectionSegment
+
+  cumlistCumListByDocId(docId: Long): CumlistCumList
+
+  cumlistCumListDues(
+    skip: Int
+    take: Int
+    where: CumlistCumListDueFilterInput
+    order: [CumlistCumListDueSortInput!]
+  ): CumlistCumListDuesCollectionSegment
+
+  cumlistCumListDueById(id: UUID): CumlistCumListDue
+}
+
+type Mutation {
+  cumlistSignDocument(input: CumlistSignDocumentInput!): CumlistSignDocumentPayload!
+  cumlistRejectDocument(input: CumlistRejectDocumentInput!): CumlistRejectDocumentPayload!
+}
+
+"""
+Общая подписка платформы на результат асинхронной операции.
+Сигнатура подтверждена общей coreSchema.graphql и используется фронтендом НВ
+после вызова командных мутаций.
+"""
+type Subscription {
+  entityOperationResult(correlationId: UUID!): String!
+}
+
+type CumlistSignDocumentPayload {
+  long: Long
+}
+
+type CumlistRejectDocumentPayload {
+  long: Long
+}
+
+input CumlistSignDocumentInput {
+  docId: Long!
+  correlationId: UUID!
+}
+
+input CumlistRejectDocumentInput {
+  discordId: Int!
+  discordText: String
+  docId: Long!
+  correlationId: UUID!
+}

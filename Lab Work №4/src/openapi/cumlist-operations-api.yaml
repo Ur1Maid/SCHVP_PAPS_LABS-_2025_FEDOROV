@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: CumList Operations API
+  version: 1.0.0
+paths:
+  /api/cumlists:
+    get:
+      summary: List cumlists
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: pageSize
+          schema: { type: integer }
+        - in: query
+          name: state
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated cumlist items
+  /api/cumlists/{id}:
+    get:
+      summary: Get cumlist by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Cumlist card }
+        '404': { description: Not found }
+  /api/cumlists/{id}/dues:
+    get:
+      summary: Get dues by cumlist id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Due items }
+  /api/cumlists/{id}/history:
+    get:
+      summary: Get history by cumlist id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: History items }
+  /api/lookups/rejection-reasons:
+    get:
+      summary: Get rejection reasons
+      responses:
+        '200': { description: Rejection reasons }
+  /api/cumlists/{id}/sign:
+    post:
+      summary: Sign document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+      responses:
+        '202': { description: Accepted }
+  /api/cumlists/{id}/reject:
+    post:
+      summary: Reject document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+      responses:
+        '202': { description: Accepted }
+  /api/cumlists/operations/bulk-sign:
+    post:
+      summary: Bulk sign documents
+      requestBody:
+        required: true
+      responses:
+        '202': { description: Accepted }
+  /api/cumlists/{id}/lock:
+    put:
+      summary: Lock document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+      responses:
+        '200': { description: Locked }
+    delete:
+      summary: Unlock document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Unlocked }

@@ -1,0 +1,560 @@
+schema {
+  query: Query
+}
+
+"Information about the offset pagination."
+type CollectionSegmentInfo {
+  "Indicates whether more items exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more items exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+}
+
+"Накопительная ведомость"
+type CumlistCumList {
+  "Идентификатор накопительной ведомости"
+  docId: Long
+  "Идентификатор главного документа"
+  mainId: Long
+  "Номер накопительной ведомости"
+  number: String
+  "Дата создания"
+  createDate: DateTime
+  "Дата начала действия"
+  startDate: DateTime
+  "Дата окончания действия"
+  finishDate: DateTime
+  "ФИО подписанта"
+  person: String
+  "Код контрагента (только при плательщике-НКП)"
+  contractor: String
+  "Описание разногласий при подписании документа"
+  discord: String
+  "Признак арбитражного суда"
+  arbSign: Boolean
+  "Номер арбитражного дела. Формат номера А[Код региона]-[Порядковый номер дела]\/[Год]"
+  arbNum: String
+  "Идентификатор клиента"
+  clientId: Long
+  "Идентификатор плательщика"
+  payerId: Long
+  "Идентификатор организации"
+  orgId: Long
+  "Идентификатор вида документа"
+  typeId: Long
+  "Идентификатор станции совершения операции"
+  stationId: Long
+  "Идентификатор формы оплаты"
+  payFormId: Long
+  "Идентификатор места оплаты"
+  payPlaceId: Long
+  "Идентиификатор минимального сбора"
+  minDueId: UUID
+  "Общая сумма платежа в рублях"
+  amountSum: Decimal
+  "Общая сумма платежа и налога в рублях"
+  amountTotal: Decimal
+  "Общая сумма налога"
+  taxValueSum: Decimal
+  "Общая сумма платежа в тенге"
+  kzAmountSum: Decimal
+  "Общая сумма платежа и налога в тенге"
+  kzAmountTotal: Decimal
+  "Общая сумма налога в тенге"
+  kzTaxValueSum: Decimal
+  "Количество сборов"
+  dueCount: Long
+  "Идентификатор типа документа"
+  docTypeId: Long
+  "Идентификатор состояния документа"
+  stateId: Long
+  "Документ"
+  document: NormDocument
+  "Главный документ"
+  mainDoc: NormDocument
+  "Клиент"
+  client("Дата запроса" requestDate: DateTime): ImpOrgPassport
+  "Плательщик"
+  payer: ImpOrgPayer
+  "Организация"
+  organization("Дата запроса" requestDate: DateTime): ImpOrgPassport
+  "Вид документа"
+  cumListType("Дата запроса" requestDate: DateTime): NsiCommon
+  "Станция совершения операции"
+  station("Дата запроса" requestDate: DateTime): NsiStation
+  "Форма оплаты"
+  payForm("Дата запроса" requestDate: DateTime): NsiInvPayForm
+  "Место оплаты"
+  payPlace("Дата запроса" requestDate: DateTime): NsiInvPayPlace
+  "Минимальный сбор"
+  minDue: CumlistCumListDue
+  "Тип документа"
+  docType: NormDocType
+  "Состояние документа"
+  state: NsiDocState
+}
+
+"Сбор накопительной ведомости"
+type CumlistCumListDue {
+  "Идентификатор записи"
+  id: UUID
+  "Дата сбора"
+  dueDate: DateTime
+  "Номер родительского документа"
+  parentDocNum: String
+  "Сумма платежа в рублях"
+  amount: Decimal
+  "Идентификатор паризнака налога обложения"
+  taxableId: Long
+  "Сумма налога"
+  taxValue: Decimal
+  "Сумма платежа в тенге"
+  kzAmount: Decimal
+  "Идентификатор признака налога обложения Республики Казахстан"
+  kzTaxableId: Long
+  "Сумма налога в тенге"
+  kzTaxValue: Decimal
+  "Данные для таксировки для печати"
+  info: String
+  "Примечание"
+  note: String
+  "Признак включения суммы сбора в первичный учётный документ"
+  existSign: Boolean
+  "Идентификатор организации, оказавшей услугу"
+  agMpsOrgId: Long
+  "Идентификатор родительского документа"
+  parentDocId: Long
+  "Идентификатор документа (накопительной ведомости)"
+  docId: Long
+  "Идентификатор типа сбора"
+  dueTypeId: Long
+  "Идентификатор типа родительского документа"
+  parentDocTypeId: Long
+  "Признак налога обложения"
+  taxable("Дата запроса" requestDate: DateTime): NsiCommon
+  "Признак налога обложения Республики Казахстан"
+  kzTaxable("Дата запроса" requestDate: DateTime): NsiCommon
+  "Организация, оказавшая услугу"
+  agMpsOrg("Дата запроса" requestDate: DateTime): ImpOrgPassport
+  "Родительский документ"
+  parentDoc: NormDocument
+  "Накопительная ведомость"
+  cumList: CumlistCumList
+  "Документ (накопительная ведомость)"
+  document: NormDocument
+  "Тип сбора"
+  dueType("Дата запроса" requestDate: DateTime): NsiDsStatList
+  "Тип родительского документа"
+  parentDocType("Дата запроса" requestDate: DateTime): NsiCommon
+}
+
+"A segment of a collection."
+type CumlistCumListDuesCollectionSegment {
+  "Information to aid in pagination."
+  pageInfo: CollectionSegmentInfo!
+  "A flattened list of the items."
+  items: [CumlistCumListDue!]
+  totalCount: Int!
+}
+
+"A segment of a collection."
+type CumlistCumListsCollectionSegment {
+  "Information to aid in pagination."
+  pageInfo: CollectionSegmentInfo!
+  "A flattened list of the items."
+  items: [CumlistCumList!]
+  totalCount: Int!
+}
+
+type ImpOrgPassport {
+  idAndRequestDate: String
+}
+
+type ImpOrgPayer {
+  orgId: Long
+}
+
+type NormDocType {
+  id: Long
+}
+
+type NormDocument {
+  id: Long
+}
+
+type NsiCommon {
+  idAndRequestDate: String
+}
+
+type NsiDocState {
+  id: Long
+}
+
+type NsiDsStatList {
+  idAndRequestDate: String
+}
+
+type NsiInvPayForm {
+  idAndRequestDate: String
+}
+
+type NsiInvPayPlace {
+  idAndRequestDate: String
+}
+
+type NsiStation {
+  idAndRequestDate: String
+}
+
+type Query {
+  """
+  Получить сборы накопительной ведомости
+  
+  **Returns:** Список сборов накопительной ведомости
+  """
+  cumlistCumListDues(skip: Int take: Int where: CumlistCumListDueFilterInput order: [CumlistCumListDueSortInput!]): CumlistCumListDuesCollectionSegment @listSize(assumedSize: 100, slicingArguments: [ "take" ], slicingArgumentDefaultValue: 50, sizedFields: [ "items" ], requireOneSlicingArgument: false)
+  """
+  Получить сборы накопительных ведомостей по идентификаторам сборов
+  
+  **Returns:** Cборы накопительных ведомостей
+  """
+  cumlistCumListDuesById("Идентификаторы сборов" id: [UUID]): [CumlistCumListDue]! @internal
+  """
+  Получить сбор накопительной ведомости по идентификатору сбора
+  
+  **Returns:** Cбор накопительной ведомости
+  """
+  cumlistCumListDueById("Идентификатор сбора" id: UUID): CumlistCumListDue
+  """
+  Получить накопительные ведомости
+  
+  **Returns:** Список накопительных ведомостей
+  """
+  cumlistCumLists(skip: Int take: Int where: CumlistCumListFilterInput order: [CumlistCumListSortInput!]): CumlistCumListsCollectionSegment @listSize(assumedSize: 100, slicingArguments: [ "take" ], slicingArgumentDefaultValue: 50, sizedFields: [ "items" ], requireOneSlicingArgument: false)
+  """
+  Получить накопительные ведомости по идентификаторам документов
+  
+  **Returns:** Накопительные ведомости
+  """
+  cumlistCumListsByDocId("Идентификаторы документов" docId: [Long]): [CumlistCumList]! @internal
+  """
+  Получить накопительную ведомость по идентификатору документа
+  
+  **Returns:** Накопительная ведомость
+  """
+  cumlistCumListByDocId("Идентификатор документа" docId: Long): CumlistCumList
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+"Сбор накопительной ведомости"
+input CumlistCumListDueFilterInput {
+  and: [CumlistCumListDueFilterInput!]
+  or: [CumlistCumListDueFilterInput!]
+  "Идентификатор записи"
+  id: UuidOperationFilterInput
+  "Дата сбора"
+  dueDate: DateTimeOperationFilterInput
+  "Номер родительского документа"
+  parentDocNum: StringOperationFilterInput
+  "Сумма платежа в рублях"
+  amount: DecimalOperationFilterInput
+  "Идентификатор паризнака налога обложения"
+  taxableId: LongOperationFilterInput
+  "Сумма налога"
+  taxValue: DecimalOperationFilterInput
+  "Сумма платежа в тенге"
+  kzAmount: DecimalOperationFilterInput
+  "Идентификатор признака налога обложения Республики Казахстан"
+  kzTaxableId: LongOperationFilterInput
+  "Сумма налога в тенге"
+  kzTaxValue: DecimalOperationFilterInput
+  "Данные для таксировки для печати"
+  info: StringOperationFilterInput
+  "Примечание"
+  note: StringOperationFilterInput
+  "Признак включения суммы сбора в первичный учётный документ"
+  existSign: BooleanOperationFilterInput
+  "Идентификатор организации, оказавшей услугу"
+  agMpsOrgId: LongOperationFilterInput
+  "Идентификатор родительского документа"
+  parentDocId: LongOperationFilterInput
+  "Идентификатор документа (накопительной ведомости)"
+  docId: LongOperationFilterInput
+  "Идентификатор типа сбора"
+  dueTypeId: LongOperationFilterInput
+  "Идентификатор типа родительского документа"
+  parentDocTypeId: LongOperationFilterInput
+}
+
+"Сбор накопительной ведомости"
+input CumlistCumListDueSortInput {
+  "Идентификатор записи"
+  id: SortEnumType
+  "Дата сбора"
+  dueDate: SortEnumType
+  "Номер родительского документа"
+  parentDocNum: SortEnumType
+  "Сумма платежа в рублях"
+  amount: SortEnumType
+  "Идентификатор паризнака налога обложения"
+  taxableId: SortEnumType
+  "Сумма налога"
+  taxValue: SortEnumType
+  "Сумма платежа в тенге"
+  kzAmount: SortEnumType
+  "Идентификатор признака налога обложения Республики Казахстан"
+  kzTaxableId: SortEnumType
+  "Сумма налога в тенге"
+  kzTaxValue: SortEnumType
+  "Данные для таксировки для печати"
+  info: SortEnumType
+  "Примечание"
+  note: SortEnumType
+  "Признак включения суммы сбора в первичный учётный документ"
+  existSign: SortEnumType
+  "Идентификатор организации, оказавшей услугу"
+  agMpsOrgId: SortEnumType
+  "Идентификатор родительского документа"
+  parentDocId: SortEnumType
+  "Идентификатор документа (накопительной ведомости)"
+  docId: SortEnumType
+  "Идентификатор типа сбора"
+  dueTypeId: SortEnumType
+  "Идентификатор типа родительского документа"
+  parentDocTypeId: SortEnumType
+}
+
+"Накопительная ведомость"
+input CumlistCumListFilterInput {
+  and: [CumlistCumListFilterInput!]
+  or: [CumlistCumListFilterInput!]
+  "Идентификатор накопительной ведомости"
+  docId: LongOperationFilterInput
+  "Идентификатор главного документа"
+  mainId: LongOperationFilterInput
+  "Номер накопительной ведомости"
+  number: StringOperationFilterInput
+  "Дата создания"
+  createDate: DateTimeOperationFilterInput
+  "Дата начала действия"
+  startDate: DateTimeOperationFilterInput
+  "Дата окончания действия"
+  finishDate: DateTimeOperationFilterInput
+  "ФИО подписанта"
+  person: StringOperationFilterInput
+  "Код контрагента (только при плательщике-НКП)"
+  contractor: StringOperationFilterInput
+  "Описание разногласий при подписании документа"
+  discord: StringOperationFilterInput
+  "Признак арбитражного суда"
+  arbSign: BooleanOperationFilterInput
+  "Номер арбитражного дела. Формат номера А[Код региона]-[Порядковый номер дела]\/[Год]"
+  arbNum: StringOperationFilterInput
+  "Идентификатор клиента"
+  clientId: LongOperationFilterInput
+  "Идентификатор плательщика"
+  payerId: LongOperationFilterInput
+  "Идентификатор организации"
+  orgId: LongOperationFilterInput
+  "Идентификатор вида документа"
+  typeId: LongOperationFilterInput
+  "Идентификатор станции совершения операции"
+  stationId: LongOperationFilterInput
+  "Идентификатор формы оплаты"
+  payFormId: LongOperationFilterInput
+  "Идентификатор места оплаты"
+  payPlaceId: LongOperationFilterInput
+  "Идентиификатор минимального сбора"
+  minDueId: UuidOperationFilterInput
+  "Общая сумма платежа в рублях"
+  amountSum: DecimalOperationFilterInput
+  "Общая сумма платежа и налога в рублях"
+  amountTotal: DecimalOperationFilterInput
+  "Общая сумма налога"
+  taxValueSum: DecimalOperationFilterInput
+  "Общая сумма платежа в тенге"
+  kzAmountSum: DecimalOperationFilterInput
+  "Общая сумма платежа и налога в тенге"
+  kzAmountTotal: DecimalOperationFilterInput
+  "Общая сумма налога в тенге"
+  kzTaxValueSum: DecimalOperationFilterInput
+  "Количество сборов"
+  dueCount: LongOperationFilterInput
+  "Идентификатор типа документа"
+  docTypeId: LongOperationFilterInput
+  "Идентификатор состояния документа"
+  stateId: LongOperationFilterInput
+}
+
+"Накопительная ведомость"
+input CumlistCumListSortInput {
+  "Идентификатор накопительной ведомости"
+  docId: SortEnumType
+  "Идентификатор главного документа"
+  mainId: SortEnumType
+  "Номер накопительной ведомости"
+  number: SortEnumType
+  "Дата создания"
+  createDate: SortEnumType
+  "Дата начала действия"
+  startDate: SortEnumType
+  "Дата окончания действия"
+  finishDate: SortEnumType
+  "ФИО подписанта"
+  person: SortEnumType
+  "Код контрагента (только при плательщике-НКП)"
+  contractor: SortEnumType
+  "Описание разногласий при подписании документа"
+  discord: SortEnumType
+  "Признак арбитражного суда"
+  arbSign: SortEnumType
+  "Номер арбитражного дела. Формат номера А[Код региона]-[Порядковый номер дела]\/[Год]"
+  arbNum: SortEnumType
+  "Идентификатор клиента"
+  clientId: SortEnumType
+  "Идентификатор плательщика"
+  payerId: SortEnumType
+  "Идентификатор организации"
+  orgId: SortEnumType
+  "Идентификатор вида документа"
+  typeId: SortEnumType
+  "Идентификатор станции совершения операции"
+  stationId: SortEnumType
+  "Идентификатор формы оплаты"
+  payFormId: SortEnumType
+  "Идентификатор места оплаты"
+  payPlaceId: SortEnumType
+  "Идентиификатор минимального сбора"
+  minDueId: SortEnumType
+  "Общая сумма платежа в рублях"
+  amountSum: SortEnumType
+  "Общая сумма платежа и налога в рублях"
+  amountTotal: SortEnumType
+  "Общая сумма налога"
+  taxValueSum: SortEnumType
+  "Общая сумма платежа в тенге"
+  kzAmountSum: SortEnumType
+  "Общая сумма платежа и налога в тенге"
+  kzAmountTotal: SortEnumType
+  "Общая сумма налога в тенге"
+  kzTaxValueSum: SortEnumType
+  "Количество сборов"
+  dueCount: SortEnumType
+  "Идентификатор типа документа"
+  docTypeId: SortEnumType
+  "Идентификатор состояния документа"
+  stateId: SortEnumType
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input DecimalOperationFilterInput {
+  eq: Decimal
+  neq: Decimal
+  in: [Decimal]
+  nin: [Decimal]
+  gt: Decimal
+  ngt: Decimal
+  gte: Decimal
+  ngte: Decimal
+  lt: Decimal
+  nlt: Decimal
+  lte: Decimal
+  nlte: Decimal
+}
+
+input LongOperationFilterInput {
+  eq: Long
+  neq: Long
+  in: [Long]
+  nin: [Long]
+  gt: Long
+  ngt: Long
+  gte: Long
+  ngte: Long
+  lt: Long
+  nlt: Long
+  lte: Long
+  nlte: Long
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+  ieq: String
+  ineq: String
+  icontains: String
+  incontains: String
+  iin: [String]
+  inin: [String]
+  istartsWith: String
+  instartsWith: String
+  iendsWith: String
+  inendsWith: String
+}
+
+input UuidOperationFilterInput {
+  eq: UUID
+  neq: UUID
+  in: [UUID]
+  nin: [UUID]
+  gt: UUID
+  ngt: UUID
+  gte: UUID
+  ngte: UUID
+  lt: UUID
+  nlt: UUID
+  lte: UUID
+  nlte: UUID
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+directive @internal on FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize("The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field." assumedSize: Int "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments." slicingArguments: [String!] "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query." slicingArgumentDefaultValue: Int "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields." sizedFields: [String!] "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error." requireOneSlicingArgument: Boolean! = true) on FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
