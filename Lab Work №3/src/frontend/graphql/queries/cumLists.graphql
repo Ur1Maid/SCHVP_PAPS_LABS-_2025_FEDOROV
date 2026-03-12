@@ -1,0 +1,17 @@
+query cumLists(
+  $take: Int
+  $skip: Int
+  $where: CumlistCumListFilterInput
+  $requestDate: DateTime!
+) {
+  cumlistCumLists(take: $take, skip: $skip, where: $where) {
+    totalCount
+    items {
+      ...cumListFull
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}

@@ -1,0 +1,13 @@
+query cumCardLayout($docId: Long) {
+  cumlistCumListByDocId(docId: $docId) {
+    docId
+    document {
+      state {
+        name
+      }
+    }
+    operationsNts {
+      isWaiting
+    }
+  }
+}

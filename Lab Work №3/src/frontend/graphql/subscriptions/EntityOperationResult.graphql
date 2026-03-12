@@ -1,0 +1,3 @@
+subscription EntityOperationResult($correlationId: UUID!) {
+  entityOperationResult(correlationId: $correlationId)
+}

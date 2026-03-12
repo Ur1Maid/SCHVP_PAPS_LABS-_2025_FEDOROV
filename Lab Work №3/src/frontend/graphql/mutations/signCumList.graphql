@@ -1,0 +1,5 @@
+mutation signCumList($input: CumlistSignDocumentInput!) {
+  cumlistSignDocument(input: $input) {
+    long
+  }
+}
