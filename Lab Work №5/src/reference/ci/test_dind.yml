@@ -1,0 +1,49 @@
+spec:
+  inputs:
+    test_project_path:
+      description: Test project path
+      default: $CI_BUILDS_DIR
+    test_dir:
+      description: Test working dir
+      default: $CI_BUILDS_DIR    
+    test_coverage:
+      description: Threshold
+      type: number
+      default: 75
+---
+.unit-tests-dind:
+  stage: test
+  image: auriga-repo.nts.local:5001/dotnet/sdk:9.0
+  services:
+    - name: registry.ntsmail.ru/library/dind-with-nts-config:latest
+      alias: docker-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker-dind:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
+    NUGET_CERT_REVOCATION_MODE: offline
+    TEST_PROJECT_PATH: $[[ inputs.test_project_path ]]
+    TEST_DIR: $[[ inputs.test_dir ]]
+    TEST_COVERAGE: $[[ inputs.test_coverage ]]
+  before_script:
+    - export DOTNET_LOG_LEVEL=debug
+    - curl -k -s https://auriga-repo.nts.local/repository/raw-nts/certs/auriga-repo-root-ca.crt -o /usr/local/share/ca-certificates/auriga-ca.crt
+    - update-ca-certificates
+    - dotnet nuget list source
+  script:
+    - dotnet restore ${TEST_PROJECT_PATH}
+    - dotnet test ${TEST_PROJECT_PATH} --logger:"junit;LogFileName=test_results.junit.xml" -p:CollectCoverage=true -p:CoverletOutput=TestResults/coverage.xml -p:CoverletOutputFormat=cobertura -p:Threshold=${TEST_COVERAGE} -p:ThresholdType=line -p:Exclude="[*UnitTests]*"
+    - dotnet tool install -g dotnet-reportgenerator-globaltool
+    - export PATH="$PATH:/root/.dotnet/tools"
+    - reportgenerator -reports:${TEST_DIR}/TestResults/coverage.xml -targetdir:${TEST_DIR}/TestResults/CoverageReport -reporttypes:"HtmlInline_AzurePipelines;Cobertura"
+  coverage: '/Total\s*\|*\s(\d+(?:\.\d+)?)/'
+  artifacts:
+    when: always
+    paths:
+      - $[[ inputs.test_dir ]]/TestResults
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: $[[ inputs.test_dir ]]/TestResults/coverage.xml
+      junit: $[[ inputs.test_dir ]]/TestResults/test_results.junit.xml

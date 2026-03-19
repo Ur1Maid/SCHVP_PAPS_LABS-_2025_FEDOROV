@@ -1,0 +1,69 @@
+spec:
+  inputs:
+    image:
+      type: string
+      default: node:18.16.0-alpine
+    stage:
+      type: string
+      default: build-static
+    environment:
+      type: string
+      default: ${CI_COMMIT_BRANCH}
+    app_type:
+      type: string
+      options:
+        - apps
+        - core
+        - shared
+        - layouts
+      default: apps
+    env_settings_dir:
+      type: string
+      default: deploy
+    npm_registry:
+      type: string
+      default: https://auriga-repo.nts.local/repository/npm/
+    pnpm_version:
+      type: string
+      default: "7.33.7"
+
+---
+.build-static:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: "true"
+    GIT_SUBMODULE_UPDATE_FLAGS: "--remote"
+    NPM_REGISTRY: $[[ inputs.npm_registry ]]  
+    PNPM_VERSION: $[[ inputs.pnpm_version ]]
+    APP_TYPE: $[[ inputs.app_type ]]
+    ENV_SETTINGS_FILE_PATH: "${CI_PROJECT_DIR}/$[[ inputs.env_settings_dir ]]/${CI_COMMIT_BRANCH}/env"
+
+  before_script:
+    - APPS=$(ls ./packages/${APP_TYPE}/)
+    - echo "$APPS"
+    - if [ -f "${ENV_SETTINGS_FILE_PATH}" ]; 
+      then
+        for app in $APPS;
+          do
+            cp "${ENV_SETTINGS_FILE_PATH}" ${CI_PROJECT_DIR}/packages/${APP_TYPE}/${app}/.env.production;
+            cat ${CI_PROJECT_DIR}/packages/${APP_TYPE}/${app}/.env.production;
+          done;
+      fi   
+    - npm config set registry "$NPM_REGISTRY"
+    - npm config set strict-ssl false
+    - npm install --location=global pnpm@"${PNPM_VERSION}"
+
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm --filter "./packages/${APP_TYPE}/**" run build
+    - APPS=$(ls ./packages/${APP_TYPE}/)
+    - for app in $APPS; do
+        mkdir -p ./artifacts/${APP_TYPE}_${app};
+        cp -R ./packages/${APP_TYPE}/${app}/build/* ./artifacts/${APP_TYPE}_${app};
+        echo ${CI_COMMIT_SHORT_SHA} > ./artifacts/${APP_TYPE}_${app}/commit_short_sha.txt; 
+        done
+  artifacts:
+    paths:
+      - artifacts/

@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  cumlist-app-service
+    image: cumlist-app-service
+    container_name: "cumlist-app-service"
+    build:
+      dockerfile: ./CumList.AppService/Dockerfile
+      context: ../src
+      extra_hosts:
+        - "auriga-repo.nts.local:10.8.50.10"
+      args:
+        - FETCH_CERTS=true
+        - FETCH_CERTS_FROM=auriga-repo.nts.local
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      Database__Server: "shared-db"
+      Database__Port: "5432"
+      Database__Database: "etran_auto_normalized_docs"
+      Database__Username: "*****"
+      Database__Password: "*****"
+      Kafka__BootstrapServers: "broker:9092"
+      Kafka__SchemaRegistryUrl: "schema-registry:8081"
+      Redis__Endpoint: "redis-cache:6379"
+    ports:
+      - "5179:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --tries=1 --no-verbose http://localhost/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nts-core-network
+
+networks:
+  nts-core-network:
+    driver: bridge
+    external: false

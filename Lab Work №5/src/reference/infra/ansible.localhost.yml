@@ -1,0 +1,81 @@
+k8s__copy_kubeconfig: true
+k8s__artifact_path: "{{ artifact_path }}"
+
+# Path where kubeconfig will be located
+k8s__kubeconfig_path: "{{ artifact_path }}/{{ environment_name }}-kubeconfig"
+
+# Name of environment
+k8s__environment_name: "{{ environment_name }}"
+k8s__bitnami_helm_repo_name: bitnami-proxy
+k8s__bitnami_helm_repo_url: https://auriga-repo.nts.local/repository/bitnami.helm/
+# Repository URL of calico helm chart
+k8s__calico_helm_repo_name: calico-proxy
+k8s__calico_helm_repo_url: https://auriga-repo.nts.local/repository/calico.helm/
+k8s__calico_helm_chart_version: v3.29.2
+
+k8s__metallb_helm_chart_version: '6.3.13'
+# Repository URL of nfs-subdir-external-provisioner helm charts
+k8s__nfs_provisioner_helm_repo_url: https://auriga-repo.nts.local/repository/nfs-subdir-external-provisioner.helm/
+k8s__nfs_provisioner_helm_repo_name: nfs-subdir-external-provisioner-proxy
+# Repository name and url of kubernetes reflector helm chart
+k8s__reflector_helm_repo_name: emberstack-proxy
+k8s__reflector_helm_repo_url: https://auriga-repo.nts.local/repository/emberstack.helm/
+# IP of local node DNS server
+k8s__nodelocaldns_local_ip: "169.254.25.10"
+# Node label for metallb L2Advertisement
+k8s__metallb_node_label: ingress
+
+# Pool of ip addresses for pods
+k8s__subnet_for_pods: "{{ pod_subnet }}"
+
+# Pool of ip addresses for services
+k8s__subnet_for_services: "{{ service_subnet }}"
+
+# IP of upstream DNS server wich is located outside the cluster
+k8s__upstream_dns_ip: 10.1.0.203
+
+# Ingress default tls certificate
+k8s__ingress_tls_cert: files/certs/ntsmail-bundle-2026.crt
+
+# Ingress default tls certificate key
+k8s__ingress_tls_key: files/certs/ntsmail-2026.key
+
+# Default path to root ca for ingress
+k8s__ingress_ca_cert: files/certs/root-ca.crt
+
+# Metallb address pool
+k8s__metallb_ip_pool:
+  - "10.130.22.200-10.130.22.220"
+
+
+##################################################### VMWare CSI Driver ########################################################
+csi_vsphere__environment: "{{ environment_name }}"
+csi_vsphere__kubeconfig: "{{ artifact_path }}/{{ environment_name }}-kubeconfig"
+csi_vsphere__cpi_helm_repo_name: vsphere-cpi-proxy
+csi_vsphere__cpi_helm_repo_url: https://auriga-repo.nts.local/repository/vsphere.helm/
+csi_vsphere__cpi_helm_version: 1.32.2
+csi_vsphere__vcenter: vcenter01.nts.local
+csi_vsphere__datacenter: DataSpace
+csi_vsphere__username: "{{ vault__csi_vmware_user }}"
+csi_vsphere__password: "{{ vault__csi_vmware_password }}"
+csi_vsphere__storage_class_parameters:
+  storagepolicyname: k8s-cns-datastore
+  datastoreurl: ds:///vmfs/volumes/686f974a-f1ef0834-2395-f0921c0e1cc8/
+
+
+###############################################  FluxCD #####################################################################
+
+fluxcd__repository_name: deployment-environments
+fluxcd__repository_check_interval: 5
+fluxcd__repository_branch: main
+fluxcd__repository_host: gitlab.ntsmail.ru
+fluxcd__repository_group: infra
+fluxcd__kubeconfig_path: "{{ artifact_path }}/{{ environment_name }}-kubeconfig"
+fluxcd__install_capacitor: false
+fluxcd__capacitor_port: 9000
+fluxcd__capacitor_version: v0.4.2
+fluxcd__ingress_class_name: nginx
+fluxcd__environment_name: "{{ environment_name }}"
+fluxcd__environment_endpoint: "{{ environment_name }}.nts.local"
+fluxcd__repository_path: infra
+fluxcd__age_key: "{{ vault__fluxcd_age_key }}"
