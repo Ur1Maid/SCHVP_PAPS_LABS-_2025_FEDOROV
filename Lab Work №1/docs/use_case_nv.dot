@@ -1,0 +1,65 @@
+
+digraph G {
+    rankdir=LR;
+    graph [fontname="DejaVu Sans", bgcolor="white", nodesep=0.5, ranksep=1.1];
+    node [fontname="DejaVu Sans"];
+    edge [fontname="DejaVu Sans"];
+
+    // Actors
+    actor1 [label="Коммерсант", shape=plaintext];
+    actor2 [label="Согласующий", shape=plaintext];
+    actor3 [label="АСУ-АСУ", shape=plaintext];
+    actor4 [label="Автосогласование", shape=plaintext];
+    actor5 [label="Интеграционный\nмодуль / ЭТРАН", shape=plaintext];
+
+    subgraph cluster_system {
+        label="Модуль «Накопительная ведомость»";
+        fontsize=18;
+        color="#4A6FA5";
+        penwidth=1.5;
+        style="rounded";
+
+        uc1 [label="Просматривать журнал НВ", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc2 [label="Фильтровать и сохранять\nпредставления", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc3 [label="Открывать карточку НВ", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc4 [label="Просматривать правила,\nсвязанные документы и историю", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc5 [label="Просматривать журнал сборов", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc6 [label="Выгружать таблицы\nв Excel", shape=ellipse, style=filled, fillcolor="#EAF2FB"];
+        uc7 [label="Подписывать документ", shape=ellipse, style=filled, fillcolor="#DDF4E4"];
+        uc8 [label="Отклонять документ", shape=ellipse, style=filled, fillcolor="#FBE3E4"];
+        uc9 [label="Выполнять групповые\nоперации", shape=ellipse, style=filled, fillcolor="#FFF3D6"];
+        uc10 [label="Получать данные НВ\nи справочники", shape=ellipse, style=dashed, fillcolor="#F7F7F7"];
+        uc11 [label="Получать результаты\nпроверок правил", shape=ellipse, style=dashed, fillcolor="#F7F7F7"];
+        uc12 [label="Отправлять операции\nна обработку", shape=ellipse, style=dashed, fillcolor="#F7F7F7"];
+    }
+
+    actor1 -> uc1;
+    actor1 -> uc2;
+    actor1 -> uc3;
+    actor1 -> uc4;
+    actor1 -> uc5;
+    actor1 -> uc6;
+
+    actor2 -> uc1;
+    actor2 -> uc2;
+    actor2 -> uc3;
+    actor2 -> uc4;
+    actor2 -> uc5;
+    actor2 -> uc6;
+    actor2 -> uc7;
+    actor2 -> uc8;
+    actor2 -> uc9;
+
+    uc3 -> uc4 [label="include", style=dashed, color="#777777"];
+    uc1 -> uc2 [label="include", style=dashed, color="#777777"];
+    uc7 -> uc12 [label="include", style=dashed, color="#777777"];
+    uc8 -> uc12 [label="include", style=dashed, color="#777777"];
+    uc9 -> uc7 [label="extend", style=dashed, color="#777777"];
+    uc9 -> uc8 [label="extend", style=dashed, color="#777777"];
+    uc1 -> uc10 [label="include", style=dashed, color="#777777"];
+    uc4 -> uc11 [label="include", style=dashed, color="#777777"];
+
+    actor3 -> uc10;
+    actor4 -> uc11;
+    actor5 -> uc12;
+}

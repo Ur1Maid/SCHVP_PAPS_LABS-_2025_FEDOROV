@@ -1,0 +1,33 @@
+
+digraph G {
+    rankdir=LR;
+    graph [fontname="DejaVu Sans", bgcolor="white", nodesep=0.6, ranksep=1.0];
+    node [fontname="DejaVu Sans", shape=box, style="rounded,filled", fillcolor="#EAF2FB", color="#4A6FA5"];
+    edge [fontname="DejaVu Sans", color="#666666"];
+
+    subgraph cluster_ops {
+        label="Контейнер: Сервис операций по НВ [C# / Service]";
+        fontsize=18;
+        color="#4A6FA5";
+        style="rounded";
+        api [label="Operations API\nПриём команд sign / reject / bulk"];
+        auth [label="Authorization & Validation\nПрава, состояние документа,\nвалидность команды"];
+        uc [label="Operation Use Cases\nExecuteSign / ExecuteReject"];
+        policy [label="Operation Policy\nРазрешённые переходы состояний"];
+        repo [label="Repositories\nDocument / CumList / Audit"];
+        outbox [label="Outbox Publisher\nПубликация сообщения в IM"];
+        mapper [label="Response Mapper\nЕдиный формат ошибок и результата"];
+    }
+
+    db [label="База модуля НВ\nPostgreSQL", shape=cylinder, style="filled", fillcolor="#DDF4E4", color="#3C7A58"];
+    im [label="Integration Module", shape=box, style="rounded,filled", fillcolor="#FFF3D6", color="#B8860B"];
+    user [label="Web-клиент НВ", shape=box, style="rounded,filled", fillcolor="#FFF3D6", color="#B8860B"];
+
+    user -> api;
+    api -> auth -> uc;
+    uc -> policy;
+    uc -> repo;
+    repo -> db;
+    uc -> outbox -> im;
+    uc -> mapper -> api;
+}

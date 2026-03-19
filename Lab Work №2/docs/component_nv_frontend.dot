@@ -1,0 +1,43 @@
+
+digraph G {
+    rankdir=LR;
+    graph [fontname="DejaVu Sans", bgcolor="white", nodesep=0.6, ranksep=1.0];
+    node [fontname="DejaVu Sans", shape=box, style="rounded,filled", fillcolor="#EAF2FB", color="#4A6FA5"];
+    edge [fontname="DejaVu Sans", color="#666666"];
+
+    subgraph cluster_frontend {
+        label="Контейнер: Режим НВ [Web: React + Apollo Client]";
+        fontsize=18;
+        color="#4A6FA5";
+        style="rounded";
+        router [label="App Router\nМаршрутизация между страницами"];
+        guard [label="Permission Guard\nПроверка ролей и действий"];
+        journal [label="CumListsTable Page\nЖурнал НВ"];
+        filters [label="Filter Builder\nГлобальный фильтр и представления"];
+        card [label="CumListCard Page\nКарточка НВ"];
+        operation [label="Operation Panel\nПодписать / Отклонить / Массовые действия"];
+        state [label="UI State Store\nВыбранные фильтры, documentId,\nstatus загрузки"];
+        gql [label="GraphQL API Client\nQueries / Mutations / Subscriptions", fillcolor="#DDF4E4", color="#3C7A58"];
+        notify [label="Notification Presenter\nОшибки, предупреждения, статусы"];
+    }
+
+    ext1 [label="Дата-сервис\nнормализованной НВ", shape=box, style="rounded,filled", fillcolor="#FFF3D6", color="#B8860B"];
+    ext2 [label="Сервис операций по НВ", shape=box, style="rounded,filled", fillcolor="#FFF3D6", color="#B8860B"];
+    ext3 [label="Сервис автосогласования", shape=box, style="rounded,filled", fillcolor="#FFF3D6", color="#B8860B"];
+
+    router -> guard -> journal;
+    journal -> filters;
+    journal -> state;
+    journal -> card;
+    card -> operation;
+    card -> state;
+    operation -> notify;
+    journal -> gql;
+    card -> gql;
+    operation -> gql;
+    gql -> ext1 [label="чтение НВ"];
+    gql -> ext2 [label="мутации операций"];
+    gql -> ext3 [label="правила / результаты"];
+    gql -> state [label="данные"];
+    notify -> journal [style=dashed];
+}
