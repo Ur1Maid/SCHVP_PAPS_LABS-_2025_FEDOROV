@@ -1,0 +1,192 @@
+image:
+  registry: auriga-repo.nts.local:5000
+  repository: applicationmoduleexample-service-dataservice
+  tag: 1
+  pullPolicy: IfNotPresent
+  # If anonymous pull is disabled specify secret contains auth data
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  pullSecrets: ""
+
+deployment:
+  replicas: 1
+  # Set enableServiceLinks to false
+  enableServiceLinks: false
+
+  # Enable readiness probe
+  #
+  # readinessProbe:
+  #   enabled: true
+  #   path: /
+  #   port: 80
+  #   period: 5
+  #   delay: 10
+  #   failures: 5
+  readinessProbe: {}
+
+  # Enable liveness probe
+  #
+  # livenessProbe:
+  #   enabled: true
+  #   path: /
+  #   port: 80
+  #   period: 5
+  #   delay: 10
+  #   failures: 5
+  livenessProbe: {}
+
+  # Limit application resources
+  #
+  # resources:
+  #   requests:
+  #     cpu: 200m
+  #     memory: 150Mi
+  #   limits:
+  #     cpu: 300m
+  #     memory: 250Mi
+  resources: {}
+
+app:
+  # Application exposed TCP port
+  exposedPort: 80
+
+  # Appsettings configuration 
+  configuration:
+    # Name of configMap created from the appsettings.json. Will be overwritten by Kustomization during deployment
+    configMapName: applicationmoduleexample-service-dataservice
+    # Name of subpath in configMap
+    # See: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+    configMapKey: appsettings.json
+
+  # Additional labels
+  # extraLabels:
+  #   label: value
+  extraLabels: {}
+
+  # Additional annotations
+  # extraAnnotations:
+  #   annotation: "value"
+  extraAnnotations: {}  
+
+  # Additional environment variables
+  #
+  # extraEnvVars:
+  #   - name: FOO
+  #     value: "bar"
+  extraEnvVars: []
+
+  # Additional volumes
+  #
+  # extraVolumes:
+  #   - name: volume
+  #     configMap:
+  #       name: configMapName
+  extraVolumes: []
+
+  # Additional volumeMounts
+  # 
+  # extraVolumeMounts:
+  #   - name: volume
+  #     mountPath: /tmp/volume
+  #     subPath: data
+  extraVolumeMounts: []
+
+certificates:
+  # If inject is enabled pod will start with Init Container that concatenates mounted certificates using update-ca-certificates util
+  inject: false
+
+  # List of configmaps contain NTS SSL certificates
+  # ceritifcate_path - name of subpath in configMap
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+  # configMaps:
+  #   - name: root-ca.crt
+  #     certificate_path: certificate
+  #   - name: intermediate-ca.crt
+  #     certificate_path: certificate
+
+# Kubernetes Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  # Create Ingress for the application
+  enabled: false 
+  # If className is not specified default will be used
+  ingressClassName: nginx
+  # Hostname
+  host: auriga-haproxy.nts.local
+  # SSL settings
+  ssl:
+    # Ingress uses SSL
+    enabled: true
+    # Secret name with SSL certificate. If not specified the default-ssl-certificate will be used instead
+    certName: ""
+
+  # Additional ingress annotations in key:value format
+  # By default double quotes will be removed by renderer:
+  #   "foo": "bar" will be rendered to foo: bar
+  #
+  # If key or value need to be quoted use the following trick
+  #   foo: '"bar"' will be rendered to foo: "bar"
+  #
+  # additional_annotations:
+  #   foo: bar
+  additional_annotations: {}
+
+  # Ingress rules
+  #
+  # If pathType parameter is ommited, default "Prefix" value is used
+  #
+  # rules:
+  #   default:
+  #     name: applicationmoduleexample-service-dataservice
+  #     rewrite: /$2
+  #     path: /api/datacenterservice(/?)(.*)
+  #     pathType: Prefix
+  #   additional:
+  #     name: applicationmoduleexample-service-dataservice-swagger
+  #     rewrite: /$2
+  #     path: /swagger/datacenterservice(/?)(.*)
+  rules: {}
+
+# HPA configuration
+#
+# autoscaling:
+#   enabled: true
+#   minReplicas: 2
+#   maxReplicas: 3
+#   targetCPUUtilizationPercentage: 80
+#   targetMemoryUtilizationPercentage: 80
+autoscaling: {}
+
+# Database Job configuration
+#
+# The Job used to create database if not exists before service starts
+# Job uses postgresql image as default DB engine
+#
+database_job:
+  enabled: false
+
+  # Database name should be the same as specified in service's appsettings.json
+  database: servicedb
+  # DB server hostname
+  server: auriga-postgres.nts.local
+  # DB server port
+  port: 5432
+
+  # Authentication parameters
+  # User should have 'CREATE DATABASE' permissions
+  auth:
+    username: ""
+    password: ""
+
+    # Use existing secret which contains credentials to access database
+    # If existingSecret.name is specified auth.username and auth.password parameters will be ignored
+    existingSecret: {}
+    #   # Secret name
+    #   name: postgresql-secret
+    #   # The key inside secret which contains username. Default: username
+    #   usernameKey: username
+    #   # The key inside secret which contains password. Default: password
+    #   passwordKey: password

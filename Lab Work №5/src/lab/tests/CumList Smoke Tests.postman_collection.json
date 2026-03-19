@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "CumList Smoke Tests",
+    "_postman_id": "2cece61e-4f6b-43e9-b7ca-5f3f991b85a9",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - frontend root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{frontend_url}}/app_cumlist/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Body contains html marker\", function () { pm.expect(pm.response.text()).to.include(\"<html\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - data service health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{data_service_url}}/healthz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - app service health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{app_service_url}}/healthz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - normalize service health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{normalize_service_url}}/healthz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

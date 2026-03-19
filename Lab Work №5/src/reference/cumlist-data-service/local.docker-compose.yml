@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  cumlist-data-service
+    image: nts/etran:cumlist-data-service
+    container_name: "cumlist-data-service"
+    build:
+      dockerfile: ./CumList.DataService/Dockerfile
+      context: ../src
+      extra_hosts:
+        - "auriga-repo.nts.local:10.8.50.10"
+      args:
+        - FETCH_CERTS=true
+        - FETCH_CERTS_FROM=auriga-repo.nts.local
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      Database__Server: "shared-db"
+      Database__Port: "5432"
+      Database__Database: "etran_auto_normalized_docs"
+      Database__Username: "*****"
+      Database__Password: "*****"
+    ports:
+      - "5178:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --tries=1 --no-verbose http://localhost/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nts-core-network
+
+networks:
+  nts-core-network:
+    driver: bridge
+    external: false
