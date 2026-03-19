@@ -1,0 +1,111 @@
+image:
+  registry: registry.ntsmail.ru
+  repository: core/ui
+  tag: "54849"
+  pullPolicy: IfNotPresent
+  # If anonymous pull is disabled specify secret contains auth data
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: ""
+
+deployment:
+  replicas: 1
+  # Enable readiness probe
+  #
+  # readinessProbe:
+  #   enabled: true
+  #   path: /
+  #   port: 80
+  #   period: 5
+  #   delay: 10
+  #   failures: 5
+  readinessProbe: {}
+  # Enable liveness probe
+  #
+  # livenessProbe:
+  #   enabled: true
+  #   path: /
+  #   port: 80
+  #   period: 5
+  #   delay: 10
+  #   failures: 5
+  livenessProbe: {}
+  # Limit application resources
+  #
+  # resources:
+  #   requests:
+  #     cpu: 200m
+  #     memory: 150Mi
+  #   limits:
+  #     cpu: 300m
+  #     memory: 250Mi
+  resources: {}
+
+app:
+  # Application exposed TCP port
+  exposedPort: 80
+
+certificates:
+  # If inject is enabled pod will start with Init Container that concatenates mounted certificates using update-ca-certificates util
+  inject: false
+  # List of configmaps contain NTS SSL certificates
+  # ceritifcate_path - name of subpath in configMap
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+  # Example:
+  # configMaps:
+  #   - name: root-ca.crt
+  #     certificate_path: certificate
+
+# Kubernetes Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  # Create Ingress for the application
+  enabled: true
+  # If className is not specified default will be used
+  ingressClassName: nginx
+  # Hostname
+  host: tt-dev.nts.local
+  # SSL settings
+  ssl:
+    # Ingress uses SSL
+    enabled: true
+    # If secret contains SSL certificate is not specified default-ssl-certificate will be used instead
+    certName: ""
+  # Additional ingress annotations in key:value format
+  # By default double quotes will be removed by renderer:
+  #   "foo": "bar" will be rendered to foo: bar
+  #
+  # If key or value need to be quoted use the following trick
+  #   foo: '"bar"' will be rendered to foo: "bar"
+  #
+  # additional_annotations:
+  #   foo: bar
+  additional_annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+  # Ingress rules
+  #
+  rules: {}
+  # default:
+  #   name: platformcore-ui
+  #   rewrite: /
+  #   path: /
+  #   # pathPrefix: /api/frontend
+  #   additional:
+  #     name: platformcore-ui-cd-docker-swagger
+  #     rewrite: /$2
+  #     path: /swagger/frontend(/?)(.*)
+  #     pathPrefix: /swagger/frontend
+  # rules: {}
+  
+# HPA configuration
+#
+# autoscaling:
+#   enabled: true
+#   minReplicas: 2
+#   maxReplicas: 3
+#   targetCPUUtilizationPercentage: 80
+#   targetMemoryUtilizationPercentage: 80
+autoscaling: {}

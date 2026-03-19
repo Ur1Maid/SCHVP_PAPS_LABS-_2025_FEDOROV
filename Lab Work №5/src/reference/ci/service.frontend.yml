@@ -1,0 +1,117 @@
+spec:
+  inputs:
+    project_group:
+    env:
+      default: ${CI_COMMIT_BRANCH}
+    deployment_folder:
+      default: deploy
+    tags:
+      type: array
+      default:
+        - docker-executor
+    app_type:
+      type: string
+      options:
+        - apps
+        - core
+        - shared
+        - layouts
+      default: apps
+
+
+---
+
+include:
+  - component: ${CI_SERVER_FQDN}/as-transport-task-nts/devops/ci/build-static/static@main
+    inputs: 
+      app_type: $[[ inputs.app_type ]]
+  - component: ${CI_SERVER_FQDN}/as-transport-task-nts/devops/ci/build/kaniko@main
+    inputs:
+      environment: $[[ inputs.env ]]
+      registry_user: ${NTS_REGISTRY_USER}
+      registry_password: ${NTS_REGISTRY_PASSWORD}
+      dockerfile: ${CI_PROJECT_DIR}/Dockerfile
+      context: ${CI_PROJECT_DIR}
+      docker_image: $[[ inputs.project_group ]]/${CI_PROJECT_NAME}
+
+  - component: ${CI_SERVER_FQDN}/as-transport-task-nts/devops/ci/flux-manifests/render@main
+    inputs:
+      environment: $[[ inputs.env ]]
+      deployment_root: $[[ inputs.deployment_folder ]]
+      service_namespace: $[[ inputs.project_group ]]
+      service_type: frontend
+      helm_chart_ref: OCIRepository/universal-frontend.flux-system
+  
+  - component: ${CI_SERVER_FQDN}/as-transport-task-nts/devops/ci/flux-manifests/push@main
+    inputs:
+      service_namespace: $[[ inputs.project_group ]]
+      environment:  $[[ inputs.env ]]
+      environment_dir: ${ENVIRONMENT_DIR}
+      environment_url:  $[[ inputs.env ]].nts.local
+      registry_user: ${NTS_REGISTRY_USER}
+      registry_password: ${NTS_REGISTRY_PASSWORD}
+      deployment_repo_url: ${DEPLOYMENT_REPO_URL}
+
+stages:
+  - build-static
+  - build
+  - deploy
+
+default:
+  tags:
+    - docker-executor
+
+.deploy-rules:
+  rules:
+    - if: $CI_COMMIT_BRANCH =~/^(develop|test|)$/
+      variables:
+        DEPLOYMENT_REPO_URL: https://gitlab-ci-token:${DEPLOYMENT_REPO_TOKEN}@gitlab.ntsmail.ru/infra/deployment-environments.git
+        ENVIRONMENT_DIR: ${CI_COMMIT_BRANCH}
+    - if: $CI_COMMIT_BRANCH == "prod"
+      variables:
+        DEPLOYMENT_REPO_URL: https://gitlab-ci-token:${DEPLOYMENT_REPO_TOKEN}@gitlab.ntsmail.ru/infra/deployment-environments.git
+        ENVIRONMENT_DIR: ${CI_COMMIT_BRANCH}
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "gid-dev"
+      variables:
+        DEPLOYMENT_REPO_URL: https://gitlab-ci-token:${GID_DEPLOYMENT_REPO_TOKEN}@gitlab.ntsmail.ru/umnodigital-soft/devops/deployment.git
+        ENVIRONMENT_DIR: "develop"
+
+workflow:
+  rules:
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+    #   when: never
+    - if: $CI_COMMIT_BRANCH
+
+build-static:
+  extends: .build-static
+  rules:
+    !reference [.deploy-rules, rules]
+
+build-image:
+  extends: .build-image
+  rules:
+    !reference [.deploy-rules, rules]
+
+render-manifest:
+  extends: .render-manifests
+  rules:
+    !reference [.deploy-rules, rules]
+
+push-manifests:
+  extends: .push-manifests
+  rules:
+   !reference [.deploy-rules, rules]
+
+build-layouts:
+  stage: build
+  trigger:
+    project: auriga/frontend/platformcore-ui-layout-user
+    branch: $CI_COMMIT_BRANCH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
+      when: "never"
+    - if: $CI_PROJECT_ID == "148"
+      when: "never"
+    - !reference [.deploy-rules, rules]

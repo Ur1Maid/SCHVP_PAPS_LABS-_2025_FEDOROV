@@ -1,0 +1,50 @@
+k8s__internet_access: false
+
+# K8s cluster version
+k8s__version: '1.32'
+
+# Address pool for pods
+k8s__subnet_for_pods: "{{ pod_subnet }}"
+
+# Address pool for services
+k8s__subnet_for_services: "{{ service_subnet }}"
+
+# Repositories URL for docker
+k8s__docker_repo_url: 'https://repo.ntstrans.ru:8443/repository/Docker_Jammy/'
+
+# Repositories URL for kubernetes
+k8s__kubernetes_repo_url: 'https://repo.ntstrans.ru:8443/repository/kubernates-pkgs-stable/v{{ k8s__version }}/deb/'
+
+k8s__containerd_insecure_registries:
+  "auriga-repo.nts.local:5000": "http://auriga-repo.nts.local:5000"
+  "docker.io": "https://repo.ntstrans.ru:8444"
+  "quay.io": "https://repo.ntstrans.ru:8444"
+  "registry-1.docker.io": "https://repo.ntstrans.ru:8444"
+  "ghcr.io": "https://repo.ntstrans.ru:8444"
+  "registry.k8s.io": "https://repo.ntstrans.ru:8444"
+k8s__containerd_registry_auth:
+  - registry: auriga-repo.nts.local:5000
+    username: nts-internal-user
+    password: "{{ vault_nexus_repo_password }}"
+
+# List of additional packages wich will be installed
+k8s__common_additional_packages:
+  - ipvsadm
+
+#####################################################################################
+
+# Group name in inventory for control plane nodes
+k8s__control_plane_group_name: control_nodes
+
+# Group name in inventory for worker nodes
+k8s__workers_group_name: worker_nodes
+
+# HA mode of kubernetes cluster
+k8s__ha_mode: "{{ groups[k8s__control_plane_group_name] | length | int > 1 }}"
+
+# External IP address for accessing the API. By default, this is the IP address of the master node,
+# but may be different in the case of HA
+k8s__control_plane_endpoint_ip: "10.130.27.100"
+
+# IP address for local DNS
+k8s__nodelocaldns_local_ip: "169.254.25.10"
