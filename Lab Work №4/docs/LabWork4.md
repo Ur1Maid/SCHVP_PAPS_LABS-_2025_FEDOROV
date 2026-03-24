@@ -948,6 +948,18 @@ subscription EntityOperationResult($correlationId: UUID!) {
 - `docId` или `id` для выборки сущности;
 - `long` для мутаций.
 
+
+Примеры постмен тестов:
+<img width="911" height="1045" alt="{DBECA3F9-BD52-4589-8129-031F39855EB8}" src="https://github.com/user-attachments/assets/6d47f207-90a3-40f1-b05c-2cc32e8b134b" />
+
+<img width="740" height="962" alt="{0B248E8D-6D6E-4EF9-8346-1EEB573C96C0}" src="https://github.com/user-attachments/assets/96ad72f1-a14d-4d99-b07c-6001f61cd9cc" />
+
+<img width="820" height="850" alt="{18ADE652-C3D1-4B85-897A-E7AA87FC502E}" src="https://github.com/user-attachments/assets/55930449-3462-441c-847d-73dc5805a007" />
+
+
+
+
+
 ### 4.3. Что именно нужно приложить в репозиторий после локального запуска
 
 Требование лабораторной работы просит показать принтскрины из Postman. Поэтому после локального запуска сервисов нужно сделать скриншоты:
