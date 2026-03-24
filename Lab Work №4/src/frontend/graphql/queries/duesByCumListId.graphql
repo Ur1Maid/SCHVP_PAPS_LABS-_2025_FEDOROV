@@ -1,0 +1,7 @@
+query duesByCumListId($requestDate: DateTime!, $docId: Long) {
+  cumlistCumListDues(where: { docId: { eq: $docId } }) {
+    items {
+      ...duesFull
+    }
+  }
+}

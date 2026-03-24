@@ -1,0 +1,5 @@
+mutation rejectCumList($input: CumlistRejectDocumentInput!) {
+  cumlistRejectDocument(input: $input) {
+    long
+  }
+}

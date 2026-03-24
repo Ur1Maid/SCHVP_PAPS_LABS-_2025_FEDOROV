@@ -1,0 +1,400 @@
+{
+  "info": {
+    "name": "CumList Operations API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "cumlist-operations-api"
+  },
+  "item": [
+    {
+      "name": "GET /api/cumlists",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists?page=1&pageSize=20&state=READY_FOR_SIGN",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists?page=1&pageSize=20&state=READY_FOR_SIGN"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has items and pageInfo', function () { pm.expect(json).to.have.property('items'); pm.expect(json).to.have.property('pageInfo'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/cumlists/101",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('ID equals 101', function () { pm.expect(json.id).to.eql(101); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/cumlists/101/dues",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/dues",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "dues"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has items array', function () { pm.expect(Array.isArray(json.items)).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/cumlists/101/history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/history",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "history"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Items have type and result', function () { if (json.items.length > 0) { pm.expect(json.items[0]).to.have.property('type'); pm.expect(json.items[0]).to.have.property('result'); } else { pm.expect(json.items.length).to.eql(0); } });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/lookups/rejection-reasons",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lookups/rejection-reasons",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lookups",
+            "rejection-reasons"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Lookup is not empty', function () { pm.expect(json.items.length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/cumlists/101/sign",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "15",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "APPROVER",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/sign",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "sign"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"comment\": \"Подписано после проверки начислений\",\n  \"ecpRequired\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 202', function () { pm.response.to.have.status(202); });",
+              "const json = pm.response.json();",
+              "pm.test('Operation is sign', function () { pm.expect(json.operation).to.eql('sign'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/cumlists/101/reject",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "15",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "APPROVER",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/reject",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "reject"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reasonId\": 2,\n  \"comment\": \"Обнаружено расхождение по результатам правила\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 202', function () { pm.response.to.have.status(202); });",
+              "const json = pm.response.json();",
+              "pm.test('Operation is reject', function () { pm.expect(json.operation).to.eql('reject'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/cumlists/operations/bulk-sign",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "15",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "APPROVER",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/operations/bulk-sign",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "operations",
+            "bulk-sign"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"documentIds\": [\n    101,\n    102,\n    103\n  ],\n  \"comment\": \"Массовое подписание\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 202', function () { pm.response.to.have.status(202); });",
+              "const json = pm.response.json();",
+              "pm.test('Has accepted and rejected', function () { pm.expect(json).to.have.property('accepted'); pm.expect(json).to.have.property('rejected'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PUT /api/cumlists/101/lock",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/lock",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "lock"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"owner\": \"cumlist-ui\",\n  \"ttlSeconds\": 120\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Locked is true', function () { pm.expect(json.locked).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "DELETE /api/cumlists/101/lock",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/cumlists/101/lock",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cumlists",
+            "101",
+            "lock"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Locked is false', function () { pm.expect(json.locked).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

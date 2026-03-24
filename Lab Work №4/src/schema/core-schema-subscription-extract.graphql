@@ -1,0 +1,16 @@
+"""
+Фрагмент общей coreSchema.graphql, использованный только как уточняющий источник
+для подтверждения корневого Subscription и сигнатуры entityOperationResult.
+Полная coreSchema.graphql не включается в лабораторную как основной контракт НВ,
+так как содержит большой объём общеплатформенных и autosign-типов.
+"""
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Subscription {
+  entityOperationResult(correlationId: UUID!): String!
+}

@@ -1,0 +1,12 @@
+query cumDetails($requestDate: DateTime!, $docId: Long) {
+  cumlistCumListByDocId(docId: $docId) {
+    ...cumListBase
+    document {
+      state {
+        id
+        name
+      }
+      lastOperDate
+    }
+  }
+}
